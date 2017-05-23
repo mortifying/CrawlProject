@@ -34,7 +34,7 @@ public class CityByYearData {
         SAXReader reader = new SAXReader();
         ConnUtil connUtil = new ConnUtil();
         try {
-            Document document = reader.read(new File("C:\\Users\\Administrator\\Downloads\\主要城市月度价格 (1).xml"));
+            Document document = reader.read(new File("F:\\分省年度数据 (8).xml"));
             Element root = document.getRootElement();
             Iterator it = root.elementIterator();
 
@@ -60,8 +60,8 @@ public class CityByYearData {
                             }else if(attr.getValue().equals("地区")){
                                 sumGDP.setRegion(field.getStringValue());
                             }else if(attr.getValue().equals("时间")){
-                                //sumGDP.setYear(field.getStringValue().substring(0,4)); //截取年
-                                sumGDP.setYear(field.getStringValue());
+                                sumGDP.setYear(field.getStringValue().substring(0,4)); //截取年
+                                //sumGDP.setYear(field.getStringValue());
                                 //sumGDP.setQuarter(field.getStringValue().substring(5));
                             }else {
                                 if(!field.getStringValue().equals("")){
