@@ -2,17 +2,18 @@ package com.parser.data;
 
 import com.parser.data.bean.CityAQIDayData;
 import com.parser.data.connutil.AQIPipeline;
+import com.parser.data.connutil.SpikeFileCacheQueueScheduler;
+import com.parser.data.connutil.SpikeUrlFile;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
+import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
 import us.codecraft.webmagic.scheduler.QueueScheduler;
 import us.codecraft.webmagic.scheduler.component.HashSetDuplicateRemover;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by root on 2017/5/8.
@@ -39,6 +40,8 @@ public class CityAQIDayDataCrawl implements PageProcessor {
             page.addTargetRequests(list);
         }else {
 
+
+
             //CityAQIDayData aqiData = new CityAQIDayData();
             String str = page.getHtml().xpath("//*[@id=\"content\"]/h1/text()").get();
             page.putField("城市：",str.substring(str.indexOf("月")+1,str.indexOf("空气质量")));
@@ -53,7 +56,12 @@ public class CityAQIDayDataCrawl implements PageProcessor {
                page.putField("NO2：",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[8]/text()").get());
                page.putField("CO：",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[9]/text()").get());
                page.putField("O3：",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[10]/text()").get());*/
-               if(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString() == null){
+               if((page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString() == null)
+                       || ((page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim().compareTo(getYestoday()) < 0)
+                       //&(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim().compareTo(getYestoday()) > -2)
+                       )){
+                   //System.out.println(getYestoday());
+                   //System.out.println(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString());
                    continue;
                }
                cityAQIDayData = new CityAQIDayData();
@@ -89,11 +97,32 @@ public class CityAQIDayDataCrawl implements PageProcessor {
         return site;
     }
 
+    public String getYestoday(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(calendar.DATE,-1);
+        return sdf.format(calendar.getTime());
+    }
+
     public static void main(String[] args) {
+
+        //SpikeFileCacheQueueScheduler file = new SpikeFileCacheQueueScheduler("E:\\IDEA_workspace\\CrawlProject\\新建文件夹");
+        //file.setRegx("http://www\\.tianqihoubao\\.com/aqi/[a-z]+-201706\\.html");
         Spider.create(new CityAQIDayDataCrawl())
                 .addUrl("http://www.tianqihoubao.com/aqi/")
-                .setScheduler(new QueueScheduler().setDuplicateRemover(new HashSetDuplicateRemover()))
+                .setScheduler(new FileCacheQueueScheduler("E:\\IDEA_workspace\\CrawlProject\\新建文件夹"))
                 .addPipeline(new AQIPipeline())
                 .run();
+
+
+        SpikeUrlFile spikeUrlFile = new SpikeUrlFile("E:\\IDEA_workspace\\CrawlProject\\新建文件夹\\www.tianqihoubao.com.urls.txt","E:\\IDEA_workspace\\CrawlProject\\新建文件夹\\www.tianqihoubao.com.cursor.txt");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
+        spikeUrlFile.setTime(sdf.format(new Date()));
+        System.out.println(spikeUrlFile.getTime());
+        spikeUrlFile.readFile();
+        spikeUrlFile.writerFile();
+        spikeUrlFile.writerCursorFile();
+
     }
 }

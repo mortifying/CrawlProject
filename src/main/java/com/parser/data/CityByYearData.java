@@ -34,7 +34,7 @@ public class CityByYearData {
         SAXReader reader = new SAXReader();
         ConnUtil connUtil = new ConnUtil();
         try {
-            Document document = reader.read(new File("F:\\分省年度数据 (8).xml"));
+            Document document = reader.read(new File("F:\\主要城市年度数据 (2).xml"));
             Element root = document.getRootElement();
             Iterator it = root.elementIterator();
 
