@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class CityAQIDayDataCrawl implements PageProcessor {
 
-    private Site site = Site.me().setRetryTimes(3).setSleepTime(1000);
+    private Site site = Site.me().setRetryTimes(3).setSleepTime(10000);
     CityAQIDayData cityAQIDayData;
     //ArrayList<CityAQIDayData> list = new ArrayList<CityAQIDayData>();
     //List list = Collections.synchronizedList(new ArrayList<CityAQIDayData>());
@@ -68,12 +68,12 @@ public class CityAQIDayDataCrawl implements PageProcessor {
                cityAQIDayData.setRegion(str.substring(str.indexOf("月")+1,str.indexOf("空气质量")));
                cityAQIDayData.setDate(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString());
                cityAQIDayData.setAqiLevel(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[2]/text()").toString());
-               cityAQIDayData.setAqiOrder(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[3]/text()").toString());
-               cityAQIDayData.setAqi(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[4]/text()").toString());
+               cityAQIDayData.setAqiOrder(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[4]/text()").toString());
+               cityAQIDayData.setAqi(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[3]/text()").toString());
                cityAQIDayData.setPm25(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[5]/text()").toString());
                cityAQIDayData.setPm10(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[6]/text()").toString());
-               cityAQIDayData.setSo2(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[7]/text()").toString());
-               cityAQIDayData.setNo2(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[8]/text()").toString());
+               cityAQIDayData.setSo2(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[8]/text()").toString());
+               cityAQIDayData.setNo2(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[7]/text()").toString());
                cityAQIDayData.setCo(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[9]/text()").toString());
                cityAQIDayData.setO3(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[10]/text()").toString());
 
