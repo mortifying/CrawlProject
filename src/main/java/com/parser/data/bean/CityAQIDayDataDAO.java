@@ -19,7 +19,7 @@ public class CityAQIDayDataDAO {
 
     public void aqiDataSave(ArrayList<CityAQIDayData> list){
 
-        String sql = "insert into cityaqidaydata(region,date,aqilevel,aqi,aqiorder,pm25,pm10,so2,no2,co,o3) values(?,?,?,?,?,?,?,?,?,?,?);";
+        String sql = "insert into cityaqidaydata_copy(region,date,aqilevel,aqi,aqiorder,pm25,pm10,so2,no2,co,o3) values(?,?,?,?,?,?,?,?,?,?,?);";
         ConnUtil connUtil = new ConnUtil();
         try {
             conn = connUtil.getConnection();
