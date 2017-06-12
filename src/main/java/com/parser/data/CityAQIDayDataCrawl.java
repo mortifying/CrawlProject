@@ -57,7 +57,7 @@ public class CityAQIDayDataCrawl implements PageProcessor {
                page.putField("O3：",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[10]/text()").get());*/
 
                if((page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString() == null)
-                       || getBeforeDayByYesterday(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim(),getYestoday()) > 3
+                       || getBeforeDayByYesterday(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim(),getYestoday()) > 1
                        //&(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim().compareTo(getYestoday()) > -2)
                        ){
                    //System.out.println(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString());
