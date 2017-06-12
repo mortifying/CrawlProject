@@ -2,16 +2,15 @@ package com.parser.data;
 
 import com.parser.data.bean.CityAQIDayData;
 import com.parser.data.connutil.AQIPipeline;
-import com.parser.data.connutil.SpikeFileCacheQueueScheduler;
 import com.parser.data.connutil.SpikeUrlFile;
 import us.codecraft.webmagic.Page;
 import us.codecraft.webmagic.Site;
 import us.codecraft.webmagic.Spider;
 import us.codecraft.webmagic.processor.PageProcessor;
 import us.codecraft.webmagic.scheduler.FileCacheQueueScheduler;
-import us.codecraft.webmagic.scheduler.QueueScheduler;
-import us.codecraft.webmagic.scheduler.component.HashSetDuplicateRemover;
 
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,7 +19,7 @@ import java.util.*;
  */
 public class CityAQIDayDataCrawl implements PageProcessor {
 
-    private Site site = Site.me().setRetryTimes(3).setSleepTime(10000);
+    private Site site = Site.me().setRetryTimes(3).setSleepTime(30000);
     CityAQIDayData cityAQIDayData;
     //ArrayList<CityAQIDayData> list = new ArrayList<CityAQIDayData>();
     //List list = Collections.synchronizedList(new ArrayList<CityAQIDayData>());
@@ -56,12 +55,13 @@ public class CityAQIDayDataCrawl implements PageProcessor {
                page.putField("NO2：",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[8]/text()").get());
                page.putField("CO：",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[9]/text()").get());
                page.putField("O3：",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[10]/text()").get());*/
+
                if((page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString() == null)
-                       || ((page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim().compareTo(getYestoday()) < 0)
+                       || getBeforeDayByYesterday(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim(),getYestoday()) > 3
                        //&(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString().trim().compareTo(getYestoday()) > -2)
-                       )){
-                   //System.out.println(getYestoday());
+                       ){
                    //System.out.println(page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString());
+                   //page.putField("dfaff",page.getHtml().xpath("/*//*[@id=\"content\"]/div[3]/table/tbody/tr["+i+"]/td[1]/text()").toString());
                    continue;
                }
                cityAQIDayData = new CityAQIDayData();
@@ -85,10 +85,10 @@ public class CityAQIDayDataCrawl implements PageProcessor {
         }
 
         if(listData.size() == 0){
-            System.out.println(listData.size());
+            //System.out.println(listData.size());
             page.setSkip(true);
         }else {
-            System.out.println(listData.size());
+            //System.out.println(listData.size());
             page.putField("list",listData);
         }
     }
@@ -105,10 +105,33 @@ public class CityAQIDayDataCrawl implements PageProcessor {
         return sdf.format(calendar.getTime());
     }
 
+    public int getBeforeDayByYesterday(String before,String yesterday){
+        SimpleDateFormat sdf =  new SimpleDateFormat("yyyy-MM-dd");
+        Date beforeDate = null;
+        Date yesterdayDate = null;
+        try {
+            beforeDate = sdf.parse(before);
+            yesterdayDate = sdf.parse(yesterday);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        Calendar beforeCalendar = Calendar.getInstance();
+        Calendar yesterdayCalendar = Calendar.getInstance();
+        beforeCalendar.setTime(beforeDate);
+        yesterdayCalendar.setTime(yesterdayDate);
+        int day = 0;
+        while (beforeCalendar.before(yesterdayCalendar)){
+            day++;
+            beforeCalendar.add(Calendar.DAY_OF_YEAR,1);
+        }
+        return day+1;
+    }
+
     public static void main(String[] args) {
 
         //SpikeFileCacheQueueScheduler file = new SpikeFileCacheQueueScheduler("E:\\IDEA_workspace\\CrawlProject\\新建文件夹");
         //file.setRegx("http://www\\.tianqihoubao\\.com/aqi/[a-z]+-201706\\.html");
+
         Spider.create(new CityAQIDayDataCrawl())
                 .addUrl("http://www.tianqihoubao.com/aqi/")
                 .setScheduler(new FileCacheQueueScheduler("E:\\IDEA_workspace\\CrawlProject\\新建文件夹"))
@@ -123,6 +146,9 @@ public class CityAQIDayDataCrawl implements PageProcessor {
         spikeUrlFile.readFile();
         spikeUrlFile.writerFile();
         spikeUrlFile.writerCursorFile();
+
+        //System.out.println("2017-06-07".compareTo("2017-06-11")); // 测试方法
+
 
     }
 }
